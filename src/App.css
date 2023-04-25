@@ -36,3 +36,8 @@
     transform: rotate(360deg);
   }
 }
+
+
+.arena{
+  background: rgba(255, 0, 0, 0.05);
+}
