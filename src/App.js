@@ -30,8 +30,6 @@ function App() {
   const stageRef = useRef(null);
   const [squarePos, setSquarePos] = useState({ x: 50, y: 50 });
 
-  // Chart.js IR graph
-  const distanceChartRef = useRef(null);
 
   const distChartRef = useRef(null);
 
@@ -63,15 +61,21 @@ function App() {
   };
 
   useEffect(() => {
-    if (distChartRef.current) {
-      const chart = distChartRef.current;
-
+    if (irChartRef.current) {
+      const chart = irChartRef.current;
       if (!chart.chart) {
         chart.chart = new Chart(chart, {
           type: "line",
           data: {
-            labels: ["D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7"], // Updated labels here
+            labels: ["IR0", "IR1", "IR2", "IR3", "IR4", "IR5", "IR6", "IR7"],
             datasets: [
+              {
+                label: "IR Values",
+                data: irValues,
+                fill: false,
+                borderColor: "rgb(58, 89, 152)",
+                tension: 0.1,
+              },
               {
                 label: "Dist Values",
                 data: distValues,
@@ -91,49 +95,12 @@ function App() {
           },
         });
       } else {
-        chart.chart.data.labels =  ["D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7"]; // Updated labels here
-        chart.chart.data.datasets[0].data = distValues;
-        chart.chart.update();
-      }
-    }
-  }, [distValues]);
-
-
-  useEffect(() => {
-    if (irChartRef.current) {
-      const chart = irChartRef.current;
-
-      if (!chart.chart) {
-        chart.chart = new Chart(chart, {
-          type: "line",
-          data: {
-            labels: ["IR0", "IR1", "IR2", "IR3", "IR4", "IR5", "IR6", "IR7"], // Updated labels here
-            datasets: [
-              {
-                label: "IR Values",
-                data: irValues,
-                fill: false,
-                borderColor: "rgb(58, 89, 152)",
-                tension: 0.1,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 1,
-              },
-            },
-          },
-        });
-      } else {
-        chart.chart.data.labels = ["IR0", "IR1", "IR2", "IR3", "IR4", "IR5", "IR6", "IR7"]; // Updated labels here
         chart.chart.data.datasets[0].data = irValues;
+        chart.chart.data.datasets[1].data = distValues;
         chart.chart.update();
       }
     }
-  }, [irValues]);
+  }, [distValues, irValues]);
 
 
   useEffect(() => {
@@ -144,7 +111,7 @@ function App() {
         chart.chart = new Chart(chart, {
           type: "line",
           data: {
-            labels: ["T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7"],
+            labels: ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7"],
             datasets: [
               {
                 label: "Tearing Values",
@@ -153,38 +120,9 @@ function App() {
                 borderColor: "rgb(129, 199, 132)",
                 tension: 0.1,
               },
-            ],
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 1,
-              },
-            },
-          },
-        });
-      } else {
-        chart.chart.data.labels = ["T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7"]; // Updated labels here
-        chart.chart.data.datasets[0].data = tearingValues;
-        chart.chart.update();
-      }
-    }
-  }, [tearingValues]);
-
-  useEffect(() => {
-    if (speedChartRef.current) {
-      const chart = speedChartRef.current;
-
-      if (!chart.chart) {
-        chart.chart = new Chart(chart, {
-          type: "line",
-          data: {
-            labels: ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7"],
-            datasets: [
               {
                 label: "Speed Values",
-                data: nociceptorValues,
+                data: speedValues,
                 fill: false,
                 borderColor: "rgb(255, 152, 0)",
                 tension: 0.1,
@@ -201,12 +139,13 @@ function App() {
           },
         });
       } else {
-        chart.chart.data.labels = ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7"]; // Updated labels here
-        chart.chart.data.datasets[0].data = speedValues;
+        chart.chart.data.datasets[0].data = tearingValues;
+        chart.chart.data.datasets[1].data = speedValues;
         chart.chart.update();
       }
     }
-  }, [speedValues]);
+  }, [tearingValues, speedValues]);
+
 
   useEffect(() => {
     if (nociceptorChartRef.current) {
@@ -618,15 +557,9 @@ function App() {
           <Col md={4}>
             <Row>
               <Col md={12}>
-                <canvas ref={distChartRef}></canvas>
-              </Col>
-              <Col md={12}>
                 <canvas ref={irChartRef}></canvas>
               </Col>
-              <Col md={6} >
-                <canvas ref={speedChartRef}></canvas>
-              </Col>
-              <Col md={6}>
+              <Col md={12}>
                 <canvas ref={tearingChartRef}></canvas>
               </Col>
               <Col md={12}>
