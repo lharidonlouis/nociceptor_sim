@@ -5,6 +5,7 @@ import Chart from "chart.js/auto";
 
 function App() {
   const [distValues, setDistValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [stageDimensions, setStageDimensions] = useState({ width: 500, height: 500 });
 
   // IR values from the simulation
   const [irValues, setIrValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
@@ -44,6 +45,22 @@ function App() {
 
   // Chart.js nociceptor graph
   const nociceptorChartRef = useRef(null);
+
+
+  const handleResize = () => {
+    const container = document.getElementById('stage-container');
+    setStageDimensions({
+      width: container.offsetWidth,
+      height: container.offsetHeight
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   // Update IR values and chart when simulation sends new values
   const handleDistValues = (values) => {
@@ -184,15 +201,16 @@ function App() {
   }, [nociceptorValues]);
 
 
-  const handleMouseMove = (event) => {
-    const stage = event.target.getStage();
-    const pointerPos = stage.getPointerPosition();
-    setSquarePos({
-      x: pointerPos.x,
-      y: pointerPos.y,
-    });
-  };
-
+    const handlePointerMove = (event) => {
+      const stage = event.target.getStage();
+      const pointerPos = stage.getPointerPosition();
+      const touchPos = event.touches && event.touches[0];
+      setSquarePos({
+        x: touchPos ? touchPos.clientX : pointerPos.x,
+        y: touchPos ? touchPos.clientY : pointerPos.y,
+      });
+    };
+    
   // Move square with arrow keys
   const handleKeyDown = (event) => {
     switch (event.code) {
@@ -495,9 +513,10 @@ function App() {
         <Row className="my-5">
           <Col md={6}>
           <h2>Arena</h2>          
-          <Stage width={500} height={500} onMouseMove={handleMouseMove} className="my-5">
+          <div id="stage-container" style={{ width: '100%', height: '500px' }}>
+          <Stage width={stageDimensions.width} height={stageDimensions.height} onPointerMove={handlePointerMove}>
             <Layer>
-              <Rect x={0} y={0} width={500} height={1000} fill="rgba(255, 0, 0, 0.025)" />
+              <Rect x={0} y={0} width={stageDimensions.width} height={stageDimensions.height} fill="rgba(255, 0, 0, 0.025)" />
               <Circle x={250} y={250} radius={50} fill="#EEE" />
               <Circle
                 x={squarePos.x}
@@ -561,6 +580,7 @@ function App() {
               })}
             </Layer>
           </Stage>
+          </div>
           </Col>
           <Col md={2}></Col>
           <Col md={4}>
