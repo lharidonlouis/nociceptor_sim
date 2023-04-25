@@ -80,7 +80,7 @@ function App() {
                 label: "Dist Values",
                 data: distValues,
                 fill: false,
-                borderColor: "rgb(75, 20, 152)",
+                borderColor: "rgb(173, 216, 230)",
                 tension: 0.1,
               },
             ],
@@ -482,10 +482,19 @@ function App() {
       </div>
       <div className="container">
         <Row className="my-5">
+          <Col md={12}>
+            <h1>Khepera IV</h1>
+            <p>
+              Khepera IV is a small mobile robot designed and manufactured by
+              K-Team Corporation. It is a differential drive robot with 2 wheels
+              and 8 IR sensors. The robot is simulated in the center of the
+              arena, move the mouse to simulate an object around khepera.
+            </p>
+          </Col>
+        </Row>
+        <Row className="my-5">
           <Col md={6}>
-          <h1>Arena simulation</h1>
-          <p>Khepera is simulated in the center of the arena,it has 8 IR sensors. Move the mouse to simulate an object around khepera.</p>
-          
+          <h2>Arena</h2>          
           <Stage width={500} height={500} onMouseMove={handleMouseMove} className="my-5">
             <Layer>
               <Rect x={0} y={0} width={500} height={1000} fill="rgba(255, 0, 0, 0.025)" />
@@ -556,6 +565,9 @@ function App() {
           <Col md={2}></Col>
           <Col md={4}>
             <Row>
+              <Col md={12}>
+                <h2>Graphs</h2>
+              </Col>
               <Col md={12}>
                 <canvas ref={irChartRef}></canvas>
               </Col>
