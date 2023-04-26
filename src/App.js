@@ -16,7 +16,7 @@ function App() {
 
   const colors = ["#000080", "#0000FF", "#0080FF", "#00BFFF", "#87CEFA", "#B0C4DE", "#F0F8FF", "#ADD8E6"];
   const max_dist = 125
-  const angle_vue = Math.PI / 1.2;
+  const angle_vue = 1.1*Math.PI ;
   const IR_DISTANCE = max_dist;
 
   // tearing values computed from IR sensor values
@@ -552,7 +552,21 @@ function App() {
                 const n_ir_arcs = 7;
                 const color = `hsl(${240+(i * 10)}, 100%, 50%)`;
 
-                const num = i-1 < 0 ? 7 : i-1;
+                
+                if(i == 0){
+                  var num = 6;
+                }
+                else if (i == 1){
+                  var num = 7;
+                }
+                else if (i == 8){
+                  var num = 0;
+                }
+                else{
+                  var num = i-2;
+                }
+
+                
 
                 return (
                   <Fragment key={i}>
