@@ -462,14 +462,15 @@ function App() {
       // ir[i] = tmp;
 
       var tmp = 0;
+
       if (distValues[i] < 0.2){
-        tmp = -0.5*distValues[i] + 1;
+        tmp = 1 - (-0.5 * distValues[i] + 1);
       }
       else if (distValues[i] >= 1){
-        tmp = 0;
+        tmp = 1;
       }
       else{
-        tmp = (1 / (5 * distValues[i])) - 0.1;
+        tmp = 1- (1 / (5 * distValues[i])) - 0.1;
       }
       ir[i] = tmp;
     }
