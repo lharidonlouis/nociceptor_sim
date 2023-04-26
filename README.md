@@ -17,7 +17,7 @@ This project is a nociceptor simulator built with React and Konva.js that allows
 2. Open `http://localhost:3000` in a web browser.
 
 ## Prod
-You can see the `app on prod https://nociceptor-sim.vercel.app`
+You can see the [app on prod](https://nociceptor-sim.vercel.app)
 
 ## Credits
 This project was created by Louis L'Haridon. 
