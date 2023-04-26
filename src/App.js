@@ -4,11 +4,19 @@ import { Stage, Layer, Circle, Rect, Arc, Text, Line } from "react-konva";
 import Chart from "chart.js/auto";
 
 function App() {
-  const [distValues, setDistValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+
+  const [nIR, setNIR] = useState(8);
+
+  const handleNIR = (event) => {
+    var val = event.target.value < 1 ? 1 : event.target.value;
+    setNIR(val);
+  };
+
+  const [distValues, setDistValues] = useState(Array(nIR).fill(0));
   const [stageDimensions, setStageDimensions] = useState({ width: 500, height: 500 });
 
   // IR values from the simulation
-  const [irValues, setIrValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [irValues, setIrValues] = useState(Array(nIR).fill(0));
 
   const prevDataRef = useRef([...irValues]);
 
@@ -16,10 +24,11 @@ function App() {
 
   const colors = ["#000080", "#0000FF", "#0080FF", "#00BFFF", "#87CEFA", "#B0C4DE", "#F0F8FF", "#ADD8E6"];
 
-
   
   const [alpha, setAlpha] = useState(1);
   const [beta, setBeta] = useState(1.5);
+
+
 
   const [max_dist, setMax_dist] = useState(125);
 
@@ -43,11 +52,11 @@ function App() {
   const IR_DISTANCE = max_dist;
 
   // tearing values computed from IR sensor values
-  const [tearingValues, setTearingValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [tearingValues, setTearingValues] = useState(Array(nIR).fill(0));
   // speed values computed from IR sensor values
-  const [speedValues, setSpeedValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [speedValues, setSpeedValues] = useState(Array(nIR).fill(0));
   // Nociceptor values computed from IR sensor values
-  const [nociceptorValues, setNociceptorValues] = useState([0, 0, 0, 0, 0, 0, 0, 0]);
+  const [nociceptorValues, setNociceptorValues] = useState(Array(nIR).fill(0));
 
 
   // Konva stage and square position
@@ -107,7 +116,7 @@ function App() {
         chart.chart = new Chart(chart, {
           type: "line",
           data: {
-            labels: ["IR0", "IR1", "IR2", "IR3", "IR4", "IR5", "IR6", "IR7"],
+            labels: Array.from({length: nIR}, (_, i) => `IR${i}`),
             datasets: [
               {
                 label: "IR Values",
@@ -142,7 +151,7 @@ function App() {
         chart.chart.update();
       }
     }
-  }, [distValues, irValues]);
+  }, [distValues, irValues, nIR]);
 
 
   useEffect(() => {
@@ -153,7 +162,7 @@ function App() {
         chart.chart = new Chart(chart, {
           type: "line",
           data: {
-            labels: ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7"],
+            labels: Array.from({length: nIR}, (_, i) => `N${i}`),
             datasets: [
               {
                 label: "Tearing Values",
@@ -186,7 +195,7 @@ function App() {
         chart.chart.update();
       }
     }
-  }, [tearingValues, speedValues]);
+  }, [tearingValues, speedValues, nIR]);
 
 
   useEffect(() => {
@@ -197,7 +206,7 @@ function App() {
         chart.chart = new Chart(chart, {
           type: "line",
           data: {
-            labels: ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7"],
+            labels: Array.from({length: nIR}, (_, i) => `N${i}`),
             datasets: [
               {
                 label: "Nociceptor Values",
@@ -218,24 +227,28 @@ function App() {
           },
         });
       } else {
-        chart.chart.data.labels = ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7"]; // Updated labels here
         chart.chart.data.datasets[0].data = nociceptorValues;
         chart.chart.update();
       }
     }
-  }, [nociceptorValues]);
+  }, [nociceptorValues, nIR]);
 
 
-    const handlePointerMove = (event) => {
-      const stage = event.target.getStage();
-      const pointerPos = stage.getPointerPosition();
-      const touchPos = event.touches && event.touches[0];
+  const handlePointerMove = (event) => {
+    const stage = event.target.getStage();
+    const pointerPos = stage.getPointerPosition();
+    const touchPos = event.touches && event.touches[0];
+    const distance = Math.sqrt(
+      (pointerPos.x - 250) ** 2 + (pointerPos.y - 250) ** 2
+    );
+    if (distance > 75) {
       setSquarePos({
         x: touchPos ? touchPos.clientX : pointerPos.x,
         y: touchPos ? touchPos.clientY : pointerPos.y,
       });
-    };
-    
+    }
+  };
+      
   // Move square with arrow keys
   const handleKeyDown = (event) => {
     switch (event.code) {
@@ -264,7 +277,7 @@ function App() {
 
     // Remove event listener when component unmounts
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [nIR]);
 
   useEffect(() => {
     const prevData = prevDataRef.current; // Use the current value of prevDataRef
@@ -296,9 +309,9 @@ function App() {
     const computeTearingValue = () => {
       const tearing_d = [];
       const tresh = 0.1;
-      const contiguousSensors = [[0, 7], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 0]];
+      const contiguousSensors = Array.from({length: nIR}, (_, i) => [(i + nIR - 1) % nIR, i]);
     
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < nIR; i++) {
         const prevDist = prevData[i];
         const currDist = irValues[i];
         const [prevContig, currContig] = contiguousSensors[i];
@@ -328,7 +341,7 @@ function App() {
     const computeSpeedValue = () => {
         const speed_d = [];
         // Compute the speed impact for each IR sensor
-        for (let i = 0; i < irValues.length; i++) {
+        for (let i = 0; i < nIR; i++) {
           const dist = -(prevData[i] - irValues[i]); // ir is inverted of distance so need to - this to get distance
           const dist_0 = dist < 0 ? 0 : dist;
           
@@ -423,8 +436,8 @@ function App() {
     const kheperaPos = { x: 250, y: 250 };
     const irSensorPositions = [];
   
-    for (let i = 0; i < 8; i++) {
-      const angle = (i * 360) / 8;
+    for (let i = 0; i < nIR; i++) {
+      const angle = (i * 360) / nIR;
       const sensorPos = {
         x: kheperaPos.x + Math.cos((angle * Math.PI) / 180) * 50,
         y: kheperaPos.y + Math.sin((angle * Math.PI) / 180) * 50,
@@ -462,7 +475,7 @@ function App() {
     }
     console.log("distances", distances);
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < nIR; i++) {
       if(is_within[i]){
         distances[i] = distances[i];
       }
@@ -482,7 +495,7 @@ function App() {
 
   useEffect(() => {
     const ir = [];
-    for(let i = 0; i < 8; i++){
+    for(let i = 0; i < nIR; i++){
       // var tmp = 1 - distValues[i];
       // ir[i] = tmp;
 
@@ -501,7 +514,7 @@ function App() {
     }
 
     //invert ir values =
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < nIR; i++) {
       ir[i] = 1 - ir[i];
     }
     console.log("ir", ir);
@@ -531,7 +544,7 @@ function App() {
             <p>
               Khepera IV is a small mobile robot designed and manufactured by
               K-Team Corporation. It is a differential drive robot with 2 wheels
-              and 8 IR sensors. The robot is simulated in the center of the
+              and <em>nIR</em> IR sensors. The robot is simulated in the center of the
               arena, move the mouse to simulate an object around khepera.
             </p>
           </Col>
@@ -550,8 +563,8 @@ function App() {
                 radius={25}
                 fill="#333"
               />
-              {[...Array(8)].map((_, i) => {
-                const numIRs = 8;
+              {[...Array(nIR)].map((_, i) => {
+                const numIRs = nIR;
                 const angle = (i * 2 * Math.PI / numIRs) - angle_vue / 2;
                 const sensorPos = {
                   x: 250 + Math.cos(angle) * 50,
@@ -579,19 +592,17 @@ function App() {
                 const color = `hsl(${240+(i * 10)}, 100%, 50%)`;
 
                 
-                if(i == 0){
-                  var num = 6;
+                let num;
+                if (i === 0) {
+                  num = nIR - 2;
+                } else if (i === 1) {
+                  num = nIR - 1;
+                } else if (i === nIR - 1) {
+                  num = 0;
+                } else {
+                  num = i - 2;
                 }
-                else if (i == 1){
-                  var num = 7;
-                }
-                else if (i == 8){
-                  var num = 0;
-                }
-                else{
-                  var num = i-2;
-                }
-
+                
                 
 
                 return (
@@ -632,6 +643,8 @@ function App() {
               <input
                 id="alpha-input"
                 type="number"
+                min="0" 
+                max="2"
                 className="form-control"
                 value={alpha}
                 onChange={handleAlphaChange}
@@ -642,11 +655,13 @@ function App() {
               <input
                 id="beta-input"
                 type="number"
+                min="0" 
+                max="10"
                 className="form-control"
                 value={beta}
                 onChange={handleBetaChange}
               />
-              <p className="mt-2">Angle of View: {Math.round(angle_vue.toFixed(2)*(180/Math.PI))}°</p>
+              <p className="mt-2">Angle of View: <em>{Math.round(angle_vue.toFixed(2)*(180/Math.PI))}°</em></p>
             </div>
             <div className="mb-3">
               <p>Range of view of the sensors (in px)</p>
@@ -656,11 +671,28 @@ function App() {
               <input
                 id="dist-input"
                 type="number"
+                min="0" 
+                max="300"
                 className="form-control"
                 value={max_dist}
                 onChange={handledDistChange}
               />
             </div>
+            {/* <div className="mb-3">
+              <p>Number of IR sensor</p>
+              <label htmlFor="nir-input" className="form-label">
+                number:
+              </label>
+              <input
+                id="nir-input"
+                type="number"
+                min="1" 
+                max="12"
+                className="form-control"
+                value={nIR}
+                onChange={handleNIR}
+              />
+            </div> */}
           </div>
           </div>
           </Col>
