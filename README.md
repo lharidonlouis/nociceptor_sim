@@ -1,7 +1,7 @@
 # Nociceptor Simulator
 
 ## Description
-This project is a nociceptor simulator built with React and Konva.js that allows you to visualize the behavior of an array of IR distance sensors.
+This project is a nociceptor simulator built with React and Konva.js that allows you to visualize the behavior of nociceptors based on IR sensors and artificial nociceptors.
 
 ## Features
 - Visualize the distances of the IR sensors on a graphical representation of a robot.
