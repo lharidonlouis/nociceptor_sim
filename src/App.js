@@ -304,7 +304,7 @@ function App() {
         const speed_d = [];
         // Compute the speed impact for each IR sensor
         for (let i = 0; i < irValues.length; i++) {
-          const dist = (prevData[i] - irValues[i]);
+          const dist = -(prevData[i] - irValues[i]);
           const dist_0 = dist < 0 ? 0 : dist;
           
           console.log(timeDiff)
