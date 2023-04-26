@@ -15,8 +15,31 @@ function App() {
   const prevTimestampRef = useRef();
 
   const colors = ["#000080", "#0000FF", "#0080FF", "#00BFFF", "#87CEFA", "#B0C4DE", "#F0F8FF", "#ADD8E6"];
-  const max_dist = 125
-  const angle_vue = 1.1*Math.PI ;
+
+
+  
+  const [alpha, setAlpha] = useState(1);
+  const [beta, setBeta] = useState(1.5);
+
+  const [max_dist, setMax_dist] = useState(125);
+
+  const handledDistChange = (event) => {
+    var val = event.target.value < 10 ? 10 : event.target.value;
+    setMax_dist(val);
+  };
+
+  const angle_vue = (alpha * Math.PI) / beta;
+
+  const handleAlphaChange = (event) => {
+    setAlpha(event.target.value);
+  };
+
+  const handleBetaChange = (event) => {
+    setBeta(event.target.value);
+  };
+
+
+
   const IR_DISTANCE = max_dist;
 
   // tearing values computed from IR sensor values
@@ -91,6 +114,7 @@ function App() {
                 data: irValues,
                 fill: false,
                 borderColor: "rgb(58, 89, 152)",
+                backgroundColor: "rgb(58, 89, 152)",
                 tension: 0.1,
               },
               {
@@ -98,6 +122,7 @@ function App() {
                 data: distValues,
                 fill: false,
                 borderColor: "rgb(173, 216, 230)",
+                backgroundColor: "rgb(173, 216, 230)",
                 tension: 0.1,
               },
             ],
@@ -304,7 +329,7 @@ function App() {
         const speed_d = [];
         // Compute the speed impact for each IR sensor
         for (let i = 0; i < irValues.length; i++) {
-          const dist = -(prevData[i] - irValues[i]);
+          const dist = -(prevData[i] - irValues[i]); // ir is inverted of distance so need to - this to get distance
           const dist_0 = dist < 0 ? 0 : dist;
           
           console.log(timeDiff)
@@ -595,6 +620,48 @@ function App() {
               })}
             </Layer>
           </Stage>
+          </div>
+          <div className="row">
+          <div className="col-md-12">
+            <h3>Sim settings</h3>
+            <p>Set the angle of view for the infrared sensors: angle = (alpha * PI) / beta.</p>
+            <div className="mb-3">
+              <label htmlFor="alpha-input" className="form-label">
+                Alpha:
+              </label>
+              <input
+                id="alpha-input"
+                type="number"
+                className="form-control"
+                value={alpha}
+                onChange={handleAlphaChange}
+              />
+              <label htmlFor="beta-input" className="form-label">
+                Beta:
+              </label>
+              <input
+                id="beta-input"
+                type="number"
+                className="form-control"
+                value={beta}
+                onChange={handleBetaChange}
+              />
+              <p className="mt-2">Angle of View: {Math.round(angle_vue.toFixed(2)*(180/Math.PI))}°</p>
+            </div>
+            <div className="mb-3">
+              <p>Range of view of the sensors (in px)</p>
+              <label htmlFor="dist-input" className="form-label">
+                distance:
+              </label>
+              <input
+                id="dist-input"
+                type="number"
+                className="form-control"
+                value={max_dist}
+                onChange={handledDistChange}
+              />
+            </div>
+          </div>
           </div>
           </Col>
           <Col md={2}></Col>
